@@ -1,0 +1,7 @@
+blank 0:		\x1b[9;0]
+powerdown 0:		\x1b[14;0]
+bg red:			\x1b[41m
+clear:			\x1b[H\x1b[J
+cursor off:		\x1b[?25l\1b[?1c
+store:			\x1b[8]
+
