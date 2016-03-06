@@ -2,7 +2,7 @@
 
 ## Important
 
-`grisly-nubs` requires a 24-bit framebuffer. Edit config.txt to include this line:
+`grisly-nubs` requires a 24-bit framebuffer. Edit `config.txt` to include this line:
 
     framebuffer_depth=24
 
