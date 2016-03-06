@@ -17,6 +17,8 @@ func decodeImageBGR8(path string) (*bytes.Buffer, error) {
 		return nil, err
 	}
 	buf := new(bytes.Buffer)
+	// pre-allocate our storage
+	buf.Grow(3 * im.Bounds().Dx() * im.Bounds().Dy())
 	for y := im.Bounds().Min.Y; y < im.Bounds().Max.Y; y++ {
 		for x := im.Bounds().Min.X; x < im.Bounds().Max.X; x++ {
 			pr, pg, pb, _ := im.At(x, y).RGBA()
