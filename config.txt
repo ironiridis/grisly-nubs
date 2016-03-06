@@ -1,0 +1,25 @@
+# Performance
+avoid_pwm_pll=1
+arm_freq=700
+sdram_freq=400
+gpu_freq=250
+over_voltage=0
+gpu_mem=64
+
+# Video Output
+## DVI (no audio)
+hdmi_drive=1
+
+## 1920x1080@60Hz
+hdmi_group=2
+hdmi_mode=82
+
+## Full Range RGB
+hdmi_pixel_encoding=2
+framebuffer_depth=24
+
+## Other misc
+disable_overscan=1
+hdmi_force_hotplug=1
+disable_splash=1
+
