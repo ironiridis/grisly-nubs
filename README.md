@@ -8,7 +8,7 @@
 
 ## General
 
-This is a bare-to-the-metal application designed to render pre-loaded image files to the HDMI port. It does not do a lot of sanity checks. For now, `grisly-nubs` is a no-training-wheels, no-seat-belts app.
+This is a bare-to-the-metal application designed to render pre-loaded image files to the HDMI port of a Raspberry Pi. It does not do a lot of sanity checks. For now, `grisly-nubs` is a no-training-wheels, no-seat-belts app.
 
 For best results:
 
