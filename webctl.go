@@ -127,10 +127,6 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandleCrashReq(w http.ResponseWriter, r *http.Request) {
-	CrashHard()
-}
-
 func init() {
 	http.HandleFunc("/slot0", HandleSlot)
 	http.HandleFunc("/slot1", HandleSlot)
@@ -144,8 +140,6 @@ func init() {
 	http.HandleFunc("/slot9", HandleSlot)
 
 	http.HandleFunc("/", HandleIndexPage)
-
-	http.HandleFunc("/crash", HandleCrashReq)
 }
 
 func StartHTTP() {

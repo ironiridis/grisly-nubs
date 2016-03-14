@@ -1,10 +1,6 @@
 package main
 
-import "runtime/debug"
-
 func main() {
-	debug.SetTraceback("all")
-	
 	conf.ReadStart()
 	PreloadSlots()
 	TerminalSetup()
