@@ -21,7 +21,7 @@ func PreloadSlots() {
 		if conf.Slots[i].Filename == "" {
 			log.Printf("Slot %d is empty.\n", i)
 		} else {
-			slots[i], err = DecodeImageBGR8(conf.Slots[i].Filename)
+			err = LoadSlot(i, conf.Slots[i].Filename)
 			if err != nil {
 				log.Printf("Slot %d failed decode: %v\n", i, err)
 			} else {
@@ -40,7 +40,7 @@ func RenderBufferToFramebuffer(buf *bytes.Buffer) error {
 		return err
 	}
 	defer fp.Close()
-	_, err = buf.WriteTo(fp)
+	_, err = fp.Write(buf.Bytes())
 	return err
 }
 
@@ -59,4 +59,12 @@ func RenderSlotToFramebuffer(s int) error {
 	conf.LastRecalled = s
 	conf.WriteDone()
 	return RenderBufferToFramebuffer(b)
+}
+
+func LoadSlot(i int, path string) error {
+	var err error
+	slotsLock.Lock()
+	defer slotsLock.Unlock()
+	slots[i], err = DecodeImageBGR8(path)
+	return err
 }

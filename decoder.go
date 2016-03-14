@@ -20,11 +20,12 @@ func DecodeImageBGR8(path string) (*bytes.Buffer, error) {
 	if err != nil {
 		return nil, err
 	}
-	buf := new(bytes.Buffer)
+	b := im.Bounds()
 	// pre-allocate our storage
-	buf.Grow(3 * im.Bounds().Dx() * im.Bounds().Dy())
-	for y := im.Bounds().Min.Y; y < im.Bounds().Max.Y; y++ {
-		for x := im.Bounds().Min.X; x < im.Bounds().Max.X; x++ {
+	buf := new(bytes.Buffer)
+	buf.Grow(3 * b.Dx() * b.Dy())
+	for y := b.Min.Y; y < b.Max.Y; y++ {
+		for x := b.Min.X; x < b.Max.X; x++ {
 			pr, pg, pb, _ := im.At(x, y).RGBA()
 			buf.Write([]byte{byte(pb >> 8), byte(pg >> 8), byte(pr >> 8)})
 		}

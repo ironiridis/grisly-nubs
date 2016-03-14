@@ -1,21 +1,17 @@
 package main
 
+import "runtime/debug"
+
 func main() {
-	var err error
+	debug.SetTraceback("all")
+	
 	conf.ReadStart()
 	PreloadSlots()
-	conf.ReadDone()
 	TerminalSetup()
-	for i := 0; i < 10; i++ {
-		_, ok := slots[i]
-		if ok {
-			err = RenderSlotToFramebuffer(i)
-			if err != nil {
-				panic(err)
-			}
-			break
-		}
-	}
+	l := conf.LastRecalled
+	conf.ReadDone()
+
+	RenderSlotToFramebuffer(l)
 
 	StartHTTP()
 }

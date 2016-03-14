@@ -11,7 +11,9 @@ const indexTemplateRaw = `
 {{range $i, $e := .Slots}}
 <div class="slot{{- $i -}}">
 <form action="/slot{{- $i -}}" method="post" enctype="multipart/form-data">
-Slot {{ $i }}: <input type="text" size="40" placeholder="Label" value="{{- .Label -}}" name="label" />
+Slot {{ $i }}:
+<a href="/slot{{- $i -}}">Activate</a>
+<input type="text" size="40" placeholder="Label" value="{{- .Label -}}" name="label" />
 <input type="file" name="f" />
 <input type="submit" value="Update">
 </form>
@@ -61,7 +63,11 @@ func HandleSlot(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSlotGETIdx(s int, w http.ResponseWriter, r *http.Request) {
-	RenderSlotToFramebuffer(s)
+	err := RenderSlotToFramebuffer(s)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
@@ -100,8 +106,15 @@ func HandleSlotPOSTIdx(s int, w http.ResponseWriter, r *http.Request) {
 	conf.WriteStart()
 	conf.Slots[s].Filename = fn
 	conf.Slots[s].Label = r.FormValue("label")
+	l := conf.LastRecalled
 	conf.WriteDone()
 
+	LoadSlot(s, fn) // Pull it into the cache immediately
+	
+	// if the last recalled slot is the one we just uploaded, re-render it
+	if s == l {
+		RenderSlotToFramebuffer(s)
+	}
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
@@ -112,6 +125,10 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func HandleCrashReq(w http.ResponseWriter, r *http.Request) {
+	CrashHard()
 }
 
 func init() {
@@ -127,6 +144,8 @@ func init() {
 	http.HandleFunc("/slot9", HandleSlot)
 
 	http.HandleFunc("/", HandleIndexPage)
+
+	http.HandleFunc("/crash", HandleCrashReq)
 }
 
 func StartHTTP() {
