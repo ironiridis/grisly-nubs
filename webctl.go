@@ -127,6 +127,13 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func HandleBootcfgProd(w http.ResponseWriter, r *http.Request) {
+	FSSetBootProd()
+}
+func HandleBootcfgDev(w http.ResponseWriter, r *http.Request) {
+	FSSetBootDev()
+}
+
 func init() {
 	http.HandleFunc("/slot0", HandleSlot)
 	http.HandleFunc("/slot1", HandleSlot)
@@ -140,6 +147,9 @@ func init() {
 	http.HandleFunc("/slot9", HandleSlot)
 
 	http.HandleFunc("/", HandleIndexPage)
+
+	http.HandleFunc("/boot_prod", HandleBootcfgProd)
+	http.HandleFunc("/boot_dev", HandleBootcfgDev)
 }
 
 func StartHTTP() {
