@@ -69,8 +69,6 @@ func HandleSlotPOSTIdx(s int, w http.ResponseWriter, r *http.Request) {
 	}
 
 	fn := fmt.Sprintf("/slots/n%d", s)
-	// TODO update configuration
-
 	CmdRemountRW.Run()
 	lfp, err := os.Create(fn)
 	if err != nil {
@@ -81,5 +79,9 @@ func HandleSlotPOSTIdx(s int, w http.ResponseWriter, r *http.Request) {
 	io.Copy(rfp, lfp)
 	CmdRemountRO.Run()
 
-	// TODO redirect back to index page
+	conf.WriteStart()
+	conf.Slots[s].Filename = fn
+	conf.WriteDone()
+	
+	http.Redirect(w, r, "/", http.StatusFound)
 }
