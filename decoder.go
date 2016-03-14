@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+import "io"
 import "image"
 import _ "image/png"
 import _ "image/jpeg"
@@ -28,4 +30,17 @@ func DecodeImageBGR8(path string) (*bytes.Buffer, error) {
 		}
 	}
 	return buf, nil
+}
+
+// ValidImage tries to decode the image and does some sanity checking of the image file.
+// It returns a boolean for validity, and an error if relevant.
+func ValidImage(r io.Reader) (bool, error) {
+	c, _, err := image.DecodeConfig(r)
+	if err != nil {
+		return false, err
+	}
+	if c.Width != 1920 || c.Height != 1080 {
+		return false, fmt.Errorf("Image must be exactly 1920x1080; this image is %dx%d.", c.Width, c.Height)
+	}
+	return true, nil
 }

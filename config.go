@@ -1,7 +1,6 @@
 package main
 
 import "os"
-import "os/exec"
 import "encoding/json"
 
 // GNConfigSlot contains the label and filename for each image slot.
@@ -46,7 +45,7 @@ func (c *GNConfig) Write() {
 		panic(err)
 	}
 
-	fp, err := os.Open("/gn_config.json")
+	fp, err := os.Create("/gn_config.json")
 	if err != nil {
 		panic(err)
 	}
