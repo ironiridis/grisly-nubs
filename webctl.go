@@ -61,7 +61,8 @@ func HandleSlot(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSlotGETIdx(s int, w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not Implemented", http.StatusInternalServerError)
+	RenderSlotToFramebuffer(s)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func HandleSlotPOSTIdx(s int, w http.ResponseWriter, r *http.Request) {
