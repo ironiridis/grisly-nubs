@@ -6,17 +6,9 @@ import "bytes"
 
 func main() {
 	var err error
-	log.Println("Starting.")
-
-	conf := NewGNConfig()
-	err = conf.Read()
-	if err != nil {
-		log.Println("Configuration file not found. Creating a blank file.")
-		conf.Write()
-	}
-
 	log.Println("Decoding stored images...")
 	slots := make(map[int]*bytes.Buffer)
+	conf.ReadStart()
 	for i := 0; i < 10; i++ {
 		if conf.Slots[i].Filename == "" {
 			log.Printf("Slot %d is empty.\n", i)
@@ -30,6 +22,7 @@ func main() {
 			}
 		}
 	}
+	conf.ReadDone()
 
 	log.Println("Configuring terminal and starting framebuffer output.")
 	TerminalSetup()

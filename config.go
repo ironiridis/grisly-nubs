@@ -1,6 +1,8 @@
 package main
 
+import "log"
 import "os"
+import "sync"
 import "encoding/json"
 
 // GNConfigSlot contains the label and filename for each image slot.
@@ -8,15 +10,22 @@ type GNConfigSlot struct {
 	Label, Filename string
 }
 
-// GNConfig is a container for GNConfigSlot elements. It may also contain some other
-// values in the future.
+// GNConfig is a container for GNConfigSlot elements, and the last recalled slot
+// number.
 type GNConfig struct {
-	Slots [10]GNConfigSlot
+	Slots        [10]GNConfigSlot
+	LastRecalled int
 }
 
-// NewGNConfig returns a mint condition GNConfig.
-func NewGNConfig() *GNConfig {
-	return &GNConfig{}
+var conf GNConfig
+var conflock sync.RWMutex
+
+func init() {
+	err := conf.Read()
+	if err != nil {
+		log.Println("Configuration file not found. Creating a blank file.")
+		conf.Write()
+	}
 }
 
 // Read attempts to pull our configuration data from storage. It will return an error if our
@@ -67,4 +76,21 @@ func (c *GNConfig) Write() {
 	}
 
 	return
+}
+
+func (c *GNConfig) ReadStart() {
+	conflock.RLock()
+}
+
+func (c *GNConfig) ReadDone() {
+	conflock.RUnlock()
+}
+
+func (c *GNConfig) WriteStart() {
+	conflock.Lock()
+}
+
+func (c *GNConfig) WriteDone() {
+	c.Write()
+	conflock.Unlock()
 }
