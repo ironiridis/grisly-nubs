@@ -49,11 +49,7 @@ func (c *GNConfig) Read() error {
 // Write will temporarily make our disk writable, flush out our configuration data, and revert
 // back to read-only. It will panic if anything goes wrong, which can happen.
 func (c *GNConfig) Write() {
-	err := CmdRemountRW.Run()
-	if err != nil {
-		panic(err)
-	}
-
+	FSRemountRW()
 	fp, err := os.Create("/gn_config.json")
 	if err != nil {
 		panic(err)
@@ -70,11 +66,7 @@ func (c *GNConfig) Write() {
 		panic(err)
 	}
 
-	err = CmdRemountRO.Run()
-	if err != nil {
-		panic(err)
-	}
-
+	FSRemountRO()
 	return
 }
 

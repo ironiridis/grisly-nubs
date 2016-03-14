@@ -37,6 +37,8 @@ func main() {
 		}
 	}
 
+	StartHTTP()
+
 	for {
 		<-time.After(1 * time.Hour)
 	}

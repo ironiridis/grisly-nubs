@@ -2,8 +2,24 @@ package main
 
 import "net/http"
 import "io"
+import "fmt"
+import "os"
+import "html/template"
 
-//import "html/template"
+const indexTemplateRaw = `
+<!DOCTYPE html><html><body>
+{{range $i, $e := .Slots}}
+<div class="slot{{- $i -}}">
+<form action="/slot{{- $i -}}" method="post" enctype="multipart/form-data">
+Slot {{ $i }}: <input type="text" size="40" placeholder="Label" value="{{- .Label -}}" name="label" />
+<input type="file" name="f" />
+<input type="submit" value="Update">
+</form>
+</div>
+{{end}}
+</body></html>`
+
+var indexTemplate = template.Must(template.New("index").Parse(indexTemplateRaw))
 
 func HandleSlot(w http.ResponseWriter, r *http.Request) {
 	var s int
@@ -45,20 +61,20 @@ func HandleSlot(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSlotGETIdx(s int, w http.ResponseWriter, r *http.Request) {
-
+	http.Error(w, "Not Implemented", http.StatusInternalServerError)
 }
 
 func HandleSlotPOSTIdx(s int, w http.ResponseWriter, r *http.Request) {
 	var err error
 	err = r.ParseMultipartForm(157286400) // about or exactly 150mB
 	if err != nil {
-		http.Error(w, "Unable to parse upload", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	rfp, _, err := r.FormFile("f")
 	if err != nil {
-		http.Error(w, "Unable to obtain uploaded file", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rfp.Close()
@@ -69,19 +85,49 @@ func HandleSlotPOSTIdx(s int, w http.ResponseWriter, r *http.Request) {
 	}
 
 	fn := fmt.Sprintf("/slots/n%d", s)
-	CmdRemountRW.Run()
+	FSRemountRW()
 	lfp, err := os.Create(fn)
 	if err != nil {
-		http.Error(w, "Unable to store file locally", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer lfp.Close()
-	io.Copy(rfp, lfp)
-	CmdRemountRO.Run()
+	rfp.Seek(0, 0) // ValidImage above will read a ways into the file
+	io.Copy(lfp, rfp)
+	lfp.Close()
+	FSRemountRO()
 
 	conf.WriteStart()
 	conf.Slots[s].Filename = fn
+	conf.Slots[s].Label = r.FormValue("label")
 	conf.WriteDone()
-	
+
 	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
+	conf.ReadStart()
+	err := indexTemplate.Execute(w, conf)
+	conf.ReadDone()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func init() {
+	http.HandleFunc("/slot0", HandleSlot)
+	http.HandleFunc("/slot1", HandleSlot)
+	http.HandleFunc("/slot2", HandleSlot)
+	http.HandleFunc("/slot3", HandleSlot)
+	http.HandleFunc("/slot4", HandleSlot)
+	http.HandleFunc("/slot5", HandleSlot)
+	http.HandleFunc("/slot6", HandleSlot)
+	http.HandleFunc("/slot7", HandleSlot)
+	http.HandleFunc("/slot8", HandleSlot)
+	http.HandleFunc("/slot9", HandleSlot)
+
+	http.HandleFunc("/", HandleIndexPage)
+}
+
+func StartHTTP() {
+	http.ListenAndServe(":8080", nil)
 }
