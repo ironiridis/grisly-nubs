@@ -6,7 +6,9 @@ import _ "image/jpeg"
 import "bytes"
 import "os"
 
-func decodeImageBGR8(path string) (*bytes.Buffer, error) {
+// DecodeImageBGR8 reads a supported image, specified by path, and stores it in a freshly-
+// allocated bytes.Buffer, which it returns.
+func DecodeImageBGR8(path string) (*bytes.Buffer, error) {
 	fp, err := os.Open(path)
 	if err != nil {
 		return nil, err

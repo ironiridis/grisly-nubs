@@ -4,28 +4,28 @@ import "os"
 import "os/exec"
 import "encoding/json"
 
-type GNSlot struct {
+// GNConfigSlot contains the label and filename for each image slot.
+type GNConfigSlot struct {
 	Label, Filename string
 }
 
+// GNConfig is a container for GNConfigSlot elements. It may also contain some other
+// values in the future.
 type GNConfig struct {
-	Slots []GNSlot
+	Slots [10]GNConfigSlot
 }
 
-var Config GNConfig
-
-var CmdRemountRO *exec.Cmd
-var CmdRemountRW *exec.Cmd
-
-func init() {
-	CmdRemountRO = exec.Command("/bin/mount", "-n", "-o", "remount,ro", "/")
-	CmdRemountRW = exec.Command("/bin/mount", "-n", "-o", "remount,rw", "/")
+// NewGNConfig returns a mint condition GNConfig.
+func NewGNConfig() *GNConfig {
+	return &GNConfig{}
 }
 
-func (c *GNConfig) Read() {
+// Read attempts to pull our configuration data from storage. It will return an error if our
+// configuration file is missing, and panic if it looks like it is corrupt.
+func (c *GNConfig) Read() error {
 	fp, err := os.Open("/gn_config.json")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer fp.Close()
 
@@ -35,9 +35,11 @@ func (c *GNConfig) Read() {
 		panic(err)
 	}
 
-	return
+	return nil
 }
 
+// Write will temporarily make our disk writable, flush out our configuration data, and revert
+// back to read-only. It will panic if anything goes wrong, which can happen.
 func (c *GNConfig) Write() {
 	err := CmdRemountRW.Run()
 	if err != nil {
