@@ -11,3 +11,8 @@ func FSRemountRO() {
 func FSRemountRW() {
 	exec.Command("/bin/mount", "-n", "-o", "remount,rw", "/").Run()
 }
+
+func init() {
+	// we need the slots directory to store our assets
+	exec.Command("/bin/mkdir", "-p", "/slots").Run()
+}

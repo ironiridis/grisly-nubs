@@ -110,7 +110,7 @@ func HandleSlotPOSTIdx(s int, w http.ResponseWriter, r *http.Request) {
 	conf.WriteDone()
 
 	LoadSlot(s, fn) // Pull it into the cache immediately
-	
+
 	// if the last recalled slot is the one we just uploaded, re-render it
 	if s == l {
 		RenderSlotToFramebuffer(s)
