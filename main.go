@@ -7,7 +7,7 @@ func main() {
 	l := conf.LastRecalled
 	conf.ReadDone()
 
-	RenderSlotToFramebuffer(l)
-
+	go RenderSlotToFramebuffer(l)
+	go ServeTCP()
 	StartHTTP()
 }
